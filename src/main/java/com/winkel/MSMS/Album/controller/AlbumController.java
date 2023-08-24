@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+@CrossOrigin
 @RestController
 @RequestMapping("/api/albums")
 public class AlbumController {
@@ -83,6 +85,11 @@ public class AlbumController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+    @RequestMapping(value = "/api/albums/{albumId}/register-interest", method = RequestMethod.OPTIONS)
+    public ResponseEntity<?> handleOptions() {
+        // Respond with necessary CORS headers
+        return ResponseEntity.ok().build();
     }
     private AlbumDTO convertToDTO(Album album) {
         AlbumDTO dto = new AlbumDTO();

@@ -30,7 +30,17 @@ public class AlbumCustomerController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(albumCustomerDTOs);
     }
+    @PostMapping("/{albumId}/register-interest")
+    public ResponseEntity<String> registerInterest(@PathVariable Long albumId) {
+        try {
+            // Perform the logic to register customer interest here
+            // For example, albumCustomerService.registerInterest(albumId);
 
+            return new ResponseEntity<>("Interest registered successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error registering customer interest: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     private AlbumDTO convertAlbumToDTO(Album album) {
         AlbumDTO dto = new AlbumDTO();
         dto.setId(album.getId());
