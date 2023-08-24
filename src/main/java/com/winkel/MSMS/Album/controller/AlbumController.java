@@ -4,6 +4,10 @@ import com.winkel.MSMS.Album.DTO.AlbumDTO;
 import com.winkel.MSMS.Album.model.Album;
 import com.winkel.MSMS.Album.repository.AlbumRepository;
 import com.winkel.MSMS.Album.service.AlbumService;
+import com.winkel.MSMS.AlbumCustomer.model.AlbumCustomer;
+import com.winkel.MSMS.AlbumCustomer.repository.AlbumCustomerRepository;
+import com.winkel.MSMS.Customer.model.Customer;
+import com.winkel.MSMS.Customer.repository.CustomerRepository;
 import com.winkel.MSMS.Store.DTO.StoreDTO;
 import com.winkel.MSMS.Store.model.Store;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +24,13 @@ public class AlbumController {
     @Autowired
     private AlbumService albumService;
     private final AlbumRepository albumRepository;
+    private AlbumCustomerRepository albumCustomerRepository;
+    private final CustomerRepository customerRepository;
 
-    public AlbumController(AlbumRepository albumRepository) {
+    public AlbumController(AlbumRepository albumRepository,
+                           CustomerRepository customerRepository) {
         this.albumRepository = albumRepository;
+        this.customerRepository = customerRepository;
     }
     @GetMapping
     public ResponseEntity<List<AlbumDTO>> getAllAlbums() {
@@ -39,22 +47,19 @@ public class AlbumController {
         AlbumDTO createdAlbumDTO = convertToDTO(createdAlbum);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAlbumDTO);
     }
-    @PostMapping("/{albumId}/register-interest")
-    public ResponseEntity<String> registerInterest(@PathVariable Long albumId) {
-        try {
-            Optional<Album> albumToRegisterInterest = albumRepository.findById(albumId);
+    @PostMapping("/api/albums/{albumId}/register-interest")
+    public ResponseEntity<String> registerInterest(@RequestParam Long albumId, @RequestParam Long customerId) {
+        Album album = albumRepository.findById(albumId).orElse(null);
+        Customer customer = customerRepository.findById(customerId).orElse(null);
 
-            if (albumToRegisterInterest.isPresent()) {
-                Album album = albumToRegisterInterest.get();
-                // You can implement the logic to register interest here,
-                // such as adding the customer to the album's list of interested customers.
-                albumRepository.save(album);
-                return ResponseEntity.ok("Interest registered successfully");
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        if (album != null && customer != null) {
+            AlbumCustomer albumCustomer = new AlbumCustomer();
+            albumCustomer.setAlbum(album);
+            albumCustomer.setCustomer(customer);
+            albumCustomerRepository.save(albumCustomer);
+            return ResponseEntity.ok("Interest registered successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid album or customer");
         }
     }
     @PutMapping("/{id}")

@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "album_customers")
 @Data
@@ -36,6 +38,22 @@ public class AlbumCustomer {
 
     public void setStore(Store store) {
         this.store = store;
+    }
+    public void registerInterest() {
+        AlbumCustomer albumCustomer = new AlbumCustomer();
+        albumCustomer.setAlbum(this.album); // Set the album reference
+        albumCustomer.setCustomer(this.customer); // Set the customer reference
+        albumCustomer.setStore(this.store); // Set the store reference
+        albumCustomer.setReserved(false); // Set the reserved flag to false
+        // Save the albumCustomer instance to the database using your repository
+        // Example: albumCustomerRepository.save(albumCustomer);
+    }
+
+    public static List<AlbumCustomer> getRegisteredCustomersForAlbum(Album album) {
+        // Retrieve registered customers for a specific album from the database using your repository
+        // Example: albumCustomerRepository.findByAlbum(album);
+        // Return the list of AlbumCustomer instances
+        return null;
     }
     private boolean reserved;
 }
